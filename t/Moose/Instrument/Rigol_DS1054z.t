@@ -25,6 +25,9 @@ eval {
     plan skip_all => "test requires PDL::Graphics::Gnuplot";
 };
 
+# run as
+#   perl -Ilib t/Moose/Instrument/Rigol_DS1054z.t --connection=USB --connection-options='{vid: 0x1ab1, pid: 0x04ce, serial: DS1ZA170502787}'
+# to populate log file with hardware responses
 my $log_file = catfile(qw/t Moose Instrument Rigol_DS1054z.yml/);
 
 my $inst = mock_instrument(
