@@ -134,7 +134,7 @@ sub  get_StopX {
     return 1;
 }
 
-sub get_trace_preambule {
+sub get_trace_preamble {
     my ( $self, %args ) = validated_hash(
         \@_,
         timeout_param(),
@@ -164,7 +164,7 @@ sub get_trace_preambule {
     # <yreference>: the vertical reference position in the Y direction.
 
     my ($format,$type,$points,$count,$xincrement,$xorigin,$xreference,$yincrement,$yorigin,$yreference) = split( /,/, $reply );
-    my %preambule = (
+    my %preamble = (
 	    format => $format,
 	    type   => $type,
 	    points => $points,
@@ -176,21 +176,21 @@ sub get_trace_preambule {
 	    yorigin => $yorigin,
 	    yreference => $yreference,
     );
-    return %preambule;
+    return %preamble;
 }
 
 sub get_Xpoints_number {
     my ( $self, %args ) = @_;
-    my %preambule = $self->get_trace_preambule(%args);
-    return $preambule{'points'};
+    my %preamble = $self->get_trace_preamble(%args);
+    return $preamble{'points'};
 }
 
 sub get_traceX {
     my ( $self, %args ) = @_;
-    my %preambule = $self->get_trace_preambule(%args);
-    my $num_points = $preambule{'points'};
-    my $xorigin = $preambule{'xorigin'};
-    my $xincrement = $preambule{'xincrement'};
+    my %preamble = $self->get_trace_preamble(%args);
+    my $num_points = $preamble{'points'};
+    my $xorigin = $preamble{'xorigin'};
+    my $xincrement = $preamble{'xincrement'};
 
     my $start = 1*$xincrement;
     my $stop  = $num_points*$xincrement;
@@ -267,7 +267,7 @@ sub get_traceY {
     # hard coded BYTE it is the fastest way to talk with Rigol
     $self->set_waveform_format(format=>'BYTE', %args);
 
-    my %preambule = $self->get_trace_preambule(trace=>$trace, %args);
+    my %preamble = $self->get_trace_preamble(trace=>$trace, %args);
 
     # Get data.
     my $binary = $self->binary_query(
@@ -299,7 +299,7 @@ sub get_traceY {
     # -------------------------------------------------------------------
     
     my $traceY = pdl @floats;
-    $traceY = ($traceY - $preambule{yorigin} - $preambule{yreference})*$preambule{yincrement};
+    $traceY = ($traceY - $preamble{yorigin} - $preamble{yreference})*$preamble{yincrement};
     return $traceY;
 
 }
