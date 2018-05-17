@@ -135,17 +135,17 @@ sub  get_StopX {
 }
 
 sub get_trace_preambule {
-    my ( $self, %args ) = @_;
-    my $trace = delete $args{trace};
-    if ( !defined $trace ) {
-	    $trace = $self->validate_trace_param(1); # every scope should have Trace 1
-    }
-    $self->write(
-        command => sprintf( ":WAVeform:SOURce  %s", $trace ),
-        %args
+    my ( $self, %args ) = validated_hash(
+        \@_,
+        timeout_param(),
+        trace => { isa => 'Int', default => 1 },
     );
+    $self->set_aquired_trace( %args );
+
+    my $trace = delete $args{trace};
     my $reply = $self->query( command => "WAVeform:PREamble?", %args );
-    #my $reply = "0,2,6000000,1,1.000000e-09,-3.000000e-03,0,4.132813e-01,0,122";
+    # reply example:
+    #i my $reply = "0,2,6000000,1,1.000000e-09,-3.000000e-03,0,4.132813e-01,0,122";
     # Format is
     # <format>,<type>,<points>,<count>,
     # <xincrement>,<xorigin>,<xreference>,
@@ -172,9 +172,9 @@ sub get_trace_preambule {
 	    xincrement => $xincrement,
 	    xorigin => $xorigin,
 	    xreference => $xreference,
-	    yincrement => $xincrement,
-	    yorigin => $xorigin,
-	    yreference => $xreference,
+	    yincrement => $yincrement,
+	    yorigin => $yorigin,
+	    yreference => $yreference,
     );
     return %preambule;
 }
@@ -262,7 +262,9 @@ sub get_traceY {
     $self->set_aquired_trace(%args);
     my $trace = delete $args{trace};
 
+    # hard coded NORMAL for 1200 data points
     $self->set_waveform_mode(mode=>'NORMAL', %args);
+    # hard coded BYTE it is the fastest way to talk with Rigol
     $self->set_waveform_format(format=>'BYTE', %args);
 
     my %preambule = $self->get_trace_preambule(trace=>$trace, %args);
@@ -298,7 +300,6 @@ sub get_traceY {
     
     my $traceY = pdl @floats;
     $traceY = ($traceY - $preambule{yorigin} - $preambule{yreference})*$preambule{yincrement};
-    #Vchan = (double(Vchan) - ch_cfg.yorigin - ch_cfg.yreference) * ch_cfg.yincrement;
     return $traceY;
 
 }
