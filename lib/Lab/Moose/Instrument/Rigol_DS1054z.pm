@@ -19,6 +19,7 @@ use Lab::Moose::Instrument qw/
     /;
 use Lab::Moose::Instrument::Cache;
 use Carp;
+use POSIX 'strftime';
 use namespace::autoclean;
 
 extends 'Lab::Moose::Instrument';
@@ -296,6 +297,7 @@ sub get_traceY {
     # -------------------------------------------------------------------
     
     my $traceY = pdl @floats;
+    $traceY = ($traceY - $preambule{yorigin} - $preambule{yreference})*$preambule{yincrement};
     #Vchan = (double(Vchan) - ch_cfg.yorigin - ch_cfg.yreference) * ch_cfg.yincrement;
     return $traceY;
 
@@ -332,10 +334,14 @@ sub get_UnitY {
 
 sub get_log_header {
     my ( $self, %args ) = @_;
+    my $date = strftime( '%Y-%m-%dT%H:%M:%S', localtime() );
+    return "$date";
 }
 
 sub get_plot_title {
     my ( $self, %args ) = @_;
+    my $date = strftime( '%Y-%m-%dT%H:%M:%S', localtime() );
+    return "$date";
 }
 
 
